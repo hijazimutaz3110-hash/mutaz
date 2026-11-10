@@ -18,20 +18,21 @@ db = SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@gmail.com'     # ضع بريدك الإلكتروني هنا
-app.config['MAIL_PASSWORD'] = 'your_app_password'        # ضع كلمة مرور التطبيق من قوقل هنا
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_app_password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your_email@gmail.com'
 
 mail = Mail(app)
 
-# ==========================================
 # إعدادات Cloudinary لرفع وحفظ الصور سحابياً
-# ==========================================
 cloudinary.config(
     cloud_name = "md30enow",
     api_key = "435334285529998",
     api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU"
 )
+
+# رقم الواتساب الخاص بالمتجر (استبدل الرقم أدناه برقمك مع رمز الدولة)
+WHATSAPP_NUMBER = "962797174200"
 
 # جدول لتخزين إعدادات الأدمن
 class AdminSetting(db.Model):
@@ -87,15 +88,17 @@ HTML_LAYOUT = """
         .search-box input { width: 100%; padding: 14px 20px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); background-color: rgba(255, 255, 255, 0.05); color: #fff; font-size: 15px; outline: none; }
         .container { padding: 20px 8% 60px 8%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; margin-top: 30px; }
-        .card { background-color: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.4s ease; }
+        .card { background-color: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.4s ease; display: flex; flex-direction: column; justify-content: space-between; }
         .card:hover { transform: translateY(-7px) scale(1.02); }
         .card-img-wrapper { width: 100%; height: 250px; overflow: hidden; background-color: #000; }
         .card img { width: 100%; height: 100%; object-fit: cover; }
         .card-body { padding: 20px; text-align: center; }
         .card-title { font-size: 22px; color: #fff; margin-bottom: 8px; }
-        .card-price { font-size: 19px; color: var(--gold-primary); font-weight: bold; }
-        .btn { display: inline-block; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
-        .btn-gold { background: linear-gradient(45deg, #b87333, #d4af37); color: #121316; }
+        .card-price { font-size: 19px; color: var(--gold-primary); font-weight: bold; margin-bottom: 15px; }
+        .btn { display: inline-block; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; text-align: center; }
+        .btn-gold { background: linear-gradient(45deg, #b87333, #d4af37); color: #121316; width: 100%; }
+        .btn-whatsapp { background-color: #25d366; color: #fff; width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .btn-whatsapp:hover { background-color: #20ba5a; }
         .btn-blue { background-color: #2563eb; color: #fff; }
         .btn-danger { background-color: #dc2626; color: #fff; }
         .field { margin-bottom: 18px; text-align: right; }
@@ -127,7 +130,7 @@ HTML_LAYOUT = """
 @app.route('/')
 def home():
     items = Item.query.all()
-    content = """
+    content = f"""
     <div class="hero-banner">
         <h1>مرحباً بكم في متجر أم ليليان</h1>
         <p>أرقى التشكيلات الفاخرة المختارة بعناية لتناسب ذوقك الرفيع</p>
@@ -140,12 +143,20 @@ def home():
             <div class="grid">
                 {% for item in items %}
                     <div class="card">
-                        <div class="card-img-wrapper">
-                            <img src="{{ item.image }}" alt="{{ item.name }}">
+                        <div>
+                            <div class="card-img-wrapper">
+                                <img src="{{ item.image }}" alt="{{ item.name }}">
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ item.name }}</h3>
+                                <div class="card-price">{{ item.price }} د.أ</div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h3 class="card-title">{{ item.name }}</h3>
-                            <div class="card-price">{{ item.price }} د.أ</div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <a href="https://wa.me/{WHATSAPP_NUMBER}?text=مرحباً، أود الاستفسار وطلب هذه القطعة: {{ item.name }} (السعر: {{ item.price }})" 
+                               target="_blank" class="btn btn-whatsapp">
+                                💬 اطلب عبر الواتساب
+                            </a>
                         </div>
                     </div>
                 {% endfor %}
@@ -302,16 +313,18 @@ def admin():
         <div class="grid">
             {% for item in items %}
                 <div class="card">
-                    <div class="card-img-wrapper">
-                        <img src="{{ item.image }}" alt="{{ item.name }}">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">{{ item.name }}</h3>
-                        <div class="card-price">{{ item.price }}</div>
-                        <div style="margin-top: 15px; display: flex; justify-content: space-around;">
-                            <a href="/admin/edit/{{ item.id }}" class="btn btn-blue">تعديل</a>
-                            <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" onclick="return confirm('هل أنت تأكد من الحذف؟')">حذف</a>
+                    <div>
+                        <div class="card-img-wrapper">
+                            <img src="{{ item.image }}" alt="{{ item.name }}">
                         </div>
+                        <div class="card-body">
+                            <h3 class="card-title">{{ item.name }}</h3>
+                            <div class="card-price">{{ item.price }}</div>
+                        </div>
+                    </div>
+                    <div style="padding: 0 20px 20px 20px; display: flex; justify-content: space-around; gap: 10px;">
+                        <a href="/admin/edit/{{ item.id }}" class="btn btn-blue" style="width: 50%;">تعديل</a>
+                        <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" style="width: 50%;" onclick="return confirm('هل أنت تأكد من الحذف؟')">حذف</a>
                     </div>
                 </div>
             {% endfor %}
@@ -360,11 +373,15 @@ def edit_item(id):
 def delete_item(id):
     if not session.get('is_admin'):
         return redirect(url_for('login'))
-    
+  
     item = Item.query.get_or_404(id)
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('admin'))
+
+@app.errorhandler(500)
+def internal_error(error):
+    return "حدث خطأ في الخادم (500). يراجع السجلات.", 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
