@@ -30,7 +30,7 @@ mail = Mail(app)
 cloudinary.config(
     cloud_name = "md30enow",
     api_key = "435334285529998",
-    api_secret = "ضع_هنا_API_Secret" # ضع الرمز السري الخاص بك هنا
+    api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU" # ضع الرمز السري الخاص بك هنا
 )
 
 # جدول لتخزين إعدادات الأدمن (مثل كلمة المرور والبريد المعتمد)

@@ -1,5 +1,6 @@
 flask
-gunicorn
 flask-SQLAlchemy
 cloudinary
 flask-mail
+gunicorn
+
