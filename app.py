@@ -130,7 +130,7 @@ HTML_LAYOUT = """
 @app.route('/')
 def home():
     items = Item.query.all()
-    content = f"""
+    content = """
     <div class="hero-banner">
         <h1>مرحباً بكم في متجر أم ليليان</h1>
         <p>أرقى التشكيلات الفاخرة المختارة بعناية لتناسب ذوقك الرفيع</p>
