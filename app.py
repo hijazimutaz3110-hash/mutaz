@@ -334,19 +334,19 @@ def home():
                         </div>
                         <div class="card-body">
                             <h3 class="card-title">{{ item.name }}</h3>
-                            <div class="card-price">{{ item.price }}</div>
+                            <div class="card-price">{{ item.price }} د.أ</div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p style="text-align: center; color: var(--text-muted); margin-top: 40px;">لا توجد قطع معروضة حالياً، يمكنك إضافتها من لوحة التحكم.</p>
+            <p style="text-align: center; color: var(--text-muted); margin-top: 2rem;">
+                لا توجد قطع معروضة حالياً، يمكنك إضافتها من لوحة التحكم.
+            </p>
         {% endif %}
     </div>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content))
-
-# تسجيل دخول الأدمن
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)# تسجيل دخول الأدمن
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
