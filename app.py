@@ -346,7 +346,9 @@ def home():
         {% endif %}
     </div>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)# تسجيل دخول الأدمن
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)
+
+# تسجيل دخول الأدمن
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -357,7 +359,7 @@ def login():
             session['is_admin'] = True
             return redirect(url_for('admin'))
         else:
-            error = "!كلمة المرور غير صحيحة"
+            error = "كلمة المرور غير صحيحة!"
 
     content = f"""
     <h2 style="text-align: center; margin-bottom: 25px; font-size: 30px;">دخول لوحة التحكم</h2>
@@ -373,7 +375,7 @@ def login():
         </div>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content))
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
 
 # صفحة نسيت كلمة المرور (إرسال الباسورد للإيميل)
 @app.route('/forgot-password', methods=['GET', 'POST'])
@@ -391,7 +393,7 @@ def forgot_password():
                 mail.send(msg_mail)
                 msg = "تم إرسال كلمة المرور بنجاح إلى بريدك الإلكتروني المعتمد!"
             except Exception as e:
-                error = f"حدث خطأ أثناء إرسال البريد: تأكد من إعدادات البريد الصحيحة."
+                error = "حدث خطأ أثناء إرسال البريد: تأكد من إعدادات البريد الصحيحة."
 
     content = f"""
     <h2 style="text-align: center; margin-bottom: 25px; font-size: 30px;">استعادة كلمة المرور</h2>
@@ -407,7 +409,7 @@ def forgot_password():
         </div>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content))
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
 
 # تسجيل الخروج
 @app.route('/logout')
@@ -452,7 +454,7 @@ def change_password():
         <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">حفظ كلمة المرور الجديدة</button>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content))
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
 
 # لوحة تحكم الأدمن (عرض وإضافة)
 @app.route('/admin', methods=['GET', 'POST'])
@@ -516,7 +518,7 @@ def admin():
         </div>
     </div>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content), items=items)
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)
 
 # تعديل قطعة
 @app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
@@ -555,7 +557,7 @@ def edit_item(id):
         <button type="submit" class="btn btn-blue" style="width: 100%; padding: 12px;">تحديث القطعة</button>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}{% endblock %}", content), item=item)
+    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), item=item)
 
 # حذف قطعة
 @app.route('/admin/delete/<int:id>')
