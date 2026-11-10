@@ -30,7 +30,7 @@ mail = Mail(app)
 cloudinary.config(
     cloud_name = "md30enow",
     api_key = "435334285529998",
-    api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU" # ضع الرمز السري الخاص بك هنا
+    api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU" # الرمز السري الخاص بك
 )
 
 # جدول لتخزين إعدادات الأدمن (مثل كلمة المرور والبريد المعتمد)
@@ -305,7 +305,7 @@ HTML_LAYOUT = """
         </div>
     </header>
 
-    {% block content %}{% endblock %}
+    __CONTENT_PLACEHOLDER__
 
 </body>
 </html>
@@ -346,7 +346,8 @@ def home():
         {% endif %}
     </div>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)
+    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
+    return render_template_string(full_html, items=items)
 
 # تسجيل دخول الأدمن
 @app.route('/login', methods=['GET', 'POST'])
@@ -375,7 +376,8 @@ def login():
         </div>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
+    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
+    return render_template_string(full_html)
 
 # صفحة نسيت كلمة المرور (إرسال الباسورد للإيميل)
 @app.route('/forgot-password', methods=['GET', 'POST'])
@@ -386,7 +388,6 @@ def forgot_password():
         admin_pass = AdminSetting.query.filter_by(key='password').first()
         if admin_pass:
             try:
-                # إرسال كلمة المرور الحالية عبر البريد الإلكتروني المبرمج
                 msg_mail = Message('استعادة كلمة مرور لوحة التحكم - متجر أم ليليان',
                               recipients=[app.config['MAIL_USERNAME']])
                 msg_mail.body = f"مرحباً بك، كلمة المرور الخاصة بلوحة التحكم هي: {admin_pass.value}"
@@ -409,7 +410,8 @@ def forgot_password():
         </div>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
+    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
+    return render_template_string(full_html)
 
 # تسجيل الخروج
 @app.route('/logout')
@@ -454,7 +456,8 @@ def change_password():
         <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">حفظ كلمة المرور الجديدة</button>
     </form>
     """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content))
+    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
+    return render_template_string(full_html)
 
 # لوحة تحكم الأدمن (عرض وإضافة)
 @app.route('/admin', methods=['GET', 'POST'])
@@ -510,65 +513,4 @@ def admin():
                         <div class="card-price">{{ item.price }}</div>
                         <div style="margin-top: 15px; display: flex; justify-content: space-around;">
                             <a href="/admin/edit/{{ item.id }}" class="btn btn-blue">تعديل</a>
-                            <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" onclick="return confirm('هل أنت تأكد من الحذف؟')">حذف</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), items=items)
-
-# تعديل قطعة
-@app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
-def edit_item(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
-    
-    item = Item.query.get_or_404(id)
-    if request.method == 'POST':
-        item.name = request.form['name']
-        item.price = request.form['price']
-        file = request.files.get('image')
-        
-        if file:
-            upload_result = cloudinary.uploader.upload(file)
-            item.image = upload_result['secure_url']
-            
-        db.session.commit()
-        return redirect(url_for('admin'))
-
-    content = """
-    <h2 style="text-align: center; margin-top: 30px; font-size: 30px;">تعديل بيانات القطعة</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="field">
-            <label>اسم القطعة</label>
-            <input type="text" name="name" value="{{ item.name }}" required>
-        </div>
-        <div class="field">
-            <label>السعر</label>
-            <input type="text" name="price" value="{{ item.price }}" required>
-        </div>
-        <div class="field">
-            <label>تغيير الصورة (اختياري)</label>
-            <input type="file" name="image" accept="image/*">
-        </div>
-        <button type="submit" class="btn btn-blue" style="width: 100%; padding: 12px;">تحديث القطعة</button>
-    </form>
-    """
-    return render_template_string(HTML_LAYOUT.replace("{% block content %}", content), item=item)
-
-# حذف قطعة
-@app.route('/admin/delete/<int:id>')
-def delete_item(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
-    
-    item = Item.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for('admin'))
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+                            <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" onclick="
