@@ -30,10 +30,10 @@ mail = Mail(app)
 cloudinary.config(
     cloud_name = "md30enow",
     api_key = "435334285529998",
-    api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU" # الرمز السري الخاص بك
+    api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU"
 )
 
-# جدول لتخزين إعدادات الأدمن (مثل كلمة المرور والبريد المعتمد)
+# جدول لتخزين إعدادات الأدمن
 class AdminSetting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False)
@@ -48,7 +48,6 @@ class Item(db.Model):
 
 with app.app_context():
     db.create_all()
-    # إنشاء كلمة مرور افتراضية (123456) إذا لم تكن موجودة مسبقاً
     admin_pass = AdminSetting.query.filter_by(key='password').first()
     if not admin_pass:
         default_pass = AdminSetting(key='password', value='123456')
@@ -74,223 +73,38 @@ HTML_LAYOUT = """
             --text-light: #f4f4f5;
             --text-muted: #a1a1aa;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        h1, h2, h3, .brand-title {
-            font-family: 'Amiri', serif;
-        }
-
-        header {
-            background: linear-gradient(180deg, #1a1c23 0%, var(--bg-dark) 100%);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 18px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand-title {
-            font-size: 28px;
-            color: var(--gold-primary);
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            margin-right: 20px;
-            font-size: 15px;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--gold-primary);
-        }
-
-        .hero-banner {
-            background: linear-gradient(135deg, #1a1c23 0%, #2a221b 50%, #121316 100%);
-            border-radius: 16px;
-            padding: 50px 30px;
-            text-align: center;
-            margin: 30px 8%;
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-
-        .hero-banner h1 {
-            font-size: 42px;
-            color: var(--gold-primary);
-            margin-bottom: 12px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-        }
-
-        .hero-banner p {
-            color: var(--text-muted);
-            font-size: 18px;
-            margin-bottom: 25px;
-        }
-
-        .search-box {
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 14px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-
-        .container {
-            padding: 20px 8% 60px 8%;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-7px) scale(1.02);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.2);
-            border-color: rgba(212, 175, 55, 0.4);
-        }
-
-        .card-img-wrapper {
-            width: 100%;
-            height: 250px;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover img {
-            transform: scale(1.08);
-        }
-
-        .card-body {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .card-title {
-            font-size: 22px;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-
-        .card-price {
-            font-size: 19px;
-            color: var(--gold-primary);
-            font-weight: bold;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 22px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .btn-gold {
-            background: linear-gradient(45deg, #b87333, #d4af37);
-            color: #121316;
-        }
-
-        .btn-gold:hover {
-            background: linear-gradient(45deg, #d4af37, #f3e5ab);
-            transform: translateY(-2px);
-        }
-
-        .btn-blue {
-            background-color: #2563eb;
-            color: #fff;
-        }
-
-        .btn-danger {
-            background-color: #dc2626;
-            color: #fff;
-        }
-
-        .field {
-            margin-bottom: 18px;
-            text-align: right;
-        }
-
-        .field label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text-muted);
-        }
-
-        .field input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #fff;
-        }
-
-        form {
-            max-width: 480px;
-            margin: 40px auto;
-            background-color: var(--bg-card);
-            padding: 30px;
-            border-radius: 14px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; }
+        h1, h2, h3, .brand-title { font-family: 'Amiri', serif; }
+        header { background: linear-gradient(180deg, #1a1c23 0%, var(--bg-dark) 100%); border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding: 18px 8%; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 28px; color: var(--gold-primary); text-decoration: none; font-weight: bold; }
+        .nav-links a { color: var(--text-light); text-decoration: none; margin-right: 20px; font-size: 15px; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--gold-primary); }
+        .hero-banner { background: linear-gradient(135deg, #1a1c23 0%, #2a221b 50%, #121316 100%); border-radius: 16px; padding: 50px 30px; text-align: center; margin: 30px 8%; border: 1px solid rgba(212, 175, 55, 0.25); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+        .hero-banner h1 { font-size: 42px; color: var(--gold-primary); margin-bottom: 12px; }
+        .hero-banner p { color: var(--text-muted); font-size: 18px; margin-bottom: 25px; }
+        .search-box { max-width: 500px; margin: 0 auto; position: relative; }
+        .search-box input { width: 100%; padding: 14px 20px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); background-color: rgba(255, 255, 255, 0.05); color: #fff; font-size: 15px; outline: none; }
+        .container { padding: 20px 8% 60px 8%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; margin-top: 30px; }
+        .card { background-color: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.4s ease; }
+        .card:hover { transform: translateY(-7px) scale(1.02); }
+        .card-img-wrapper { width: 100%; height: 250px; overflow: hidden; background-color: #000; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 20px; text-align: center; }
+        .card-title { font-size: 22px; color: #fff; margin-bottom: 8px; }
+        .card-price { font-size: 19px; color: var(--gold-primary); font-weight: bold; }
+        .btn { display: inline-block; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
+        .btn-gold { background: linear-gradient(45deg, #b87333, #d4af37); color: #121316; }
+        .btn-blue { background-color: #2563eb; color: #fff; }
+        .btn-danger { background-color: #dc2626; color: #fff; }
+        .field { margin-bottom: 18px; text-align: right; }
+        .field label { display: block; margin-bottom: 6px; color: var(--text-muted); }
+        .field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+        form { max-width: 480px; margin: 40px auto; background-color: var(--bg-card); padding: 30px; border-radius: 14px; border: 1px solid rgba(212, 175, 55, 0.2); }
     </style>
 </head>
 <body>
-
     <header>
         <a href="/" class="brand-title">✨ متجر أم ليليان</a>
         <div class="nav-links">
@@ -306,12 +120,10 @@ HTML_LAYOUT = """
     </header>
 
     __CONTENT_PLACEHOLDER__
-
 </body>
 </html>
 """
 
-# الصفحة الرئيسية للزبائن
 @app.route('/')
 def home():
     items = Item.query.all()
@@ -323,7 +135,6 @@ def home():
             <input type="text" placeholder="ابحثي عن قطعتك المفضلة...">
         </div>
     </div>
-
     <div class="container">
         {% if items %}
             <div class="grid">
@@ -346,10 +157,8 @@ def home():
         {% endif %}
     </div>
     """
-    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
-    return render_template_string(full_html, items=items)
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), items=items)
 
-# تسجيل دخول الأدمن
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -376,10 +185,8 @@ def login():
         </div>
     </form>
     """
-    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
-    return render_template_string(full_html)
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
 
-# صفحة نسيت كلمة المرور (إرسال الباسورد للإيميل)
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     msg = None
@@ -410,16 +217,13 @@ def forgot_password():
         </div>
     </form>
     """
-    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
-    return render_template_string(full_html)
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
 
-# تسجيل الخروج
 @app.route('/logout')
 def logout():
     session.pop('is_admin', None)
     return redirect(url_for('home'))
 
-# تغيير كلمة المرور للأدمن
 @app.route('/admin/change-password', methods=['GET', 'POST'])
 def change_password():
     if not session.get('is_admin'):
@@ -430,9 +234,7 @@ def change_password():
     if request.method == 'POST':
         old_password = request.form.get('old_password')
         new_password = request.form.get('new_password')
-        
         admin_pass = AdminSetting.query.filter_by(key='password').first()
-        
         if admin_pass and old_password == admin_pass.value:
             admin_pass.value = new_password
             db.session.commit()
@@ -456,10 +258,8 @@ def change_password():
         <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">حفظ كلمة المرور الجديدة</button>
     </form>
     """
-    full_html = HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content)
-    return render_template_string(full_html)
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
 
-# لوحة تحكم الأدمن (عرض وإضافة)
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if not session.get('is_admin'):
@@ -473,7 +273,6 @@ def admin():
         if file:
             upload_result = cloudinary.uploader.upload(file)
             image_url = upload_result['secure_url']
-
             new_item = Item(name=name, price=price, image=image_url)
             db.session.add(new_item)
             db.session.commit()
@@ -483,7 +282,6 @@ def admin():
     content = """
     <div class="container">
         <h2 style="text-align: center; margin: 20px 0; font-size: 32px;">إدارة المعرض</h2>
-        
         <form method="POST" enctype="multipart/form-data">
             <h3 style="margin-bottom: 15px; text-align: center; color: var(--gold-primary);">إضافة قطعة جديدة</h3>
             <div class="field">
@@ -500,7 +298,6 @@ def admin():
             </div>
             <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">نشر في المعرض</button>
         </form>
-
         <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 26px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">القطع الحالية:</h3>
         <div class="grid">
             {% for item in items %}
@@ -513,4 +310,61 @@ def admin():
                         <div class="card-price">{{ item.price }}</div>
                         <div style="margin-top: 15px; display: flex; justify-content: space-around;">
                             <a href="/admin/edit/{{ item.id }}" class="btn btn-blue">تعديل</a>
-                            <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" onclick="
+                            <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" onclick="return confirm('هل أنت تأكد من الحذف؟')">حذف</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), items=items)
+
+@app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
+def edit_item(id):
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
+    
+    item = Item.query.get_or_404(id)
+    if request.method == 'POST':
+        item.name = request.form['name']
+        item.price = request.form['price']
+        file = request.files.get('image')
+        if file:
+            upload_result = cloudinary.uploader.upload(file)
+            item.image = upload_result['secure_url']
+        db.session.commit()
+        return redirect(url_for('admin'))
+
+    content = """
+    <h2 style="text-align: center; margin-top: 30px; font-size: 30px;">تعديل بيانات القطعة</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="field">
+            <label>اسم القطعة</label>
+            <input type="text" name="name" value="{{ item.name }}" required>
+        </div>
+        <div class="field">
+            <label>السعر</label>
+            <input type="text" name="price" value="{{ item.price }}" required>
+        </div>
+        <div class="field">
+            <label>تغيير الصورة (اختياري)</label>
+            <input type="file" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-blue" style="width: 100%; padding: 12px;">تحديث القطعة</button>
+    </form>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), item=item)
+
+@app.route('/admin/delete/<int:id>')
+def delete_item(id):
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
+    
+    item = Item.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
