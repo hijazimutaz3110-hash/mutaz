@@ -153,7 +153,7 @@ def home():
                             </div>
                         </div>
                         <div style="padding: 0 20px 20px 20px;">
-                            <a href="https://wa.me/{WHATSAPP_NUMBER}?text=مرحباً، أود الاستفسار وطلب هذه القطعة: {{ item.name }} (السعر: {{ item.price }})" 
+                            <a href="https://wa.me/{962797174200}?text=مرحباً، أود الاستفسار وطلب هذه القطعة: {{ item.name }} (السعر: {{ item.price }})" 
                                target="_blank" class="btn btn-whatsapp">
                                 💬 اطلب عبر الواتساب
                             </a>
