@@ -9,8 +9,12 @@ import cloudinary.uploader
 app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this'
 
-# إعدادات قاعدة البيانات
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# إعدادات قاعدة البيانات - الربط التلقائي بقاعدة بيانات Supabase المضافة في Render
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -31,7 +35,7 @@ cloudinary.config(
     api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU"
 )
 
-# رقم الواتساب الخاص بالمتجر (استبدل الرقم أدناه برقمك مع رمز الدولة)
+# رقم الواتساب الخاص بالمتجر
 WHATSAPP_NUMBER = "962797174200"
 
 # جدول لتخزين إعدادات الأدمن
@@ -309,76 +313,4 @@ def admin():
             </div>
             <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">نشر في المعرض</button>
         </form>
-        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 26px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">القطع الحالية:</h3>
-        <div class="grid">
-            {% for item in items %}
-                <div class="card">
-                    <div>
-                        <div class="card-img-wrapper">
-                            <img src="{{ item.image }}" alt="{{ item.name }}">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title">{{ item.name }}</h3>
-                            <div class="card-price">{{ item.price }}</div>
-                        </div>
-                    </div>
-                    <div style="padding: 0 20px 20px 20px; display: flex; justify-content: space-around; gap: 10px;">
-                        <a href="/admin/edit/{{ item.id }}" class="btn btn-blue" style="width: 50%;">تعديل</a>
-                        <a href="/admin/delete/{{ item.id }}" class="btn btn-danger" style="width: 50%;" onclick="return confirm('هل أنت تأكد من الحذف؟')">حذف</a>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    """
-    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), items=items)
-
-@app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
-def edit_item(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
-    
-    item = Item.query.get_or_404(id)
-    if request.method == 'POST':
-        item.name = request.form['name']
-        item.price = request.form['price']
-        file = request.files.get('image')
-        if file:
-            upload_result = cloudinary.uploader.upload(file)
-            item.image = upload_result['secure_url']
-        db.session.commit()
-        return redirect(url_for('admin'))
-
-    content = """
-    <h2 style="text-align: center; margin-top: 30px; font-size: 30px;">تعديل بيانات القطعة</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="field">
-            <label>اسم القطعة</label>
-            <input type="text" name="name" value="{{ item.name }}" required>
-        </div>
-        <div class="field">
-            <label>السعر</label>
-            <input type="text" name="price" value="{{ item.price }}" required>
-        </div>
-        <div class="field">
-            <label>تغيير الصورة (اختياري)</label>
-            <input type="file" name="image" accept="image/*">
-        </div>
-        <button type="submit" class="btn btn-blue" style="width: 100%; padding: 12px;">تحديث القطعة</button>
-    </form>
-    """
-    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), item=item)
-
-@app.route('/admin/delete/<int:id>')
-def delete_item(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
-  
-    item = Item.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for('admin'))
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+        <h3 style="margin-top: 40px; margin-bottom: 20px;

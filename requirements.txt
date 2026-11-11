@@ -1,6 +1,6 @@
 flask
 flask-SQLAlchemy
-cloudinary
 flask-mail
+cloudinary
 gunicorn
-
+psycopg2-binary
