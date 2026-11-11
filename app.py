@@ -9,7 +9,6 @@ import cloudinary.uploader
 app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this'
 
-# إعدادات قاعدة البيانات - الربط التلقائي بقاعدة بيانات Supabase المضافة في Render
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -18,7 +17,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# إعدادات البريد الإلكتروني لاستعادة الباسورد
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -28,23 +26,19 @@ app.config['MAIL_DEFAULT_SENDER'] = 'your_email@gmail.com'
 
 mail = Mail(app)
 
-# إعدادات Cloudinary لرفع وحفظ الصور سحابياً
 cloudinary.config(
     cloud_name = "md30enow",
     api_key = "435334285529998",
     api_secret = "BcNjtX9xe4br0XyWFsrVtaK3VjU"
 )
 
-# رقم الواتساب الخاص بالمتجر
 WHATSAPP_NUMBER = "962797174200"
 
-# جدول لتخزين إعدادات الأدمن
 class AdminSetting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False)
     value = db.Column(db.String(200), nullable=False)
 
-# نموذج قطع المجوهرات
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -59,9 +53,7 @@ with app.app_context():
         db.session.add(default_pass)
         db.session.commit()
 
-# القالب الأساسي والتصميم (HTML + CSS)
-HTML_LAYOUT = """
-<!DOCTYPE html>
+HTML_LAYOUT = """<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -128,8 +120,7 @@ HTML_LAYOUT = """
 
     __CONTENT_PLACEHOLDER__
 </body>
-</html>
-"""
+</html>"""
 
 @app.route('/')
 def home():
