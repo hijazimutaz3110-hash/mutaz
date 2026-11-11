@@ -105,4 +105,248 @@ HTML_LAYOUT = """<!DOCTYPE html>
         .field { margin-bottom: 18px; text-align: right; }
         .field label { display: block; margin-bottom: 6px; color: var(--text-muted); }
         .field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(255, 255, 255, 0.05); color: #fff; }
-        form { max-width: 480px; margin: 40px auto; background-color: var(--bg-card); padding: 30px; border-radius: 14px;
+        form { max-width: 480px; margin: 40px auto; background-color: var(--bg-card); padding: 30px; border-radius: 14px; border: 1px solid rgba(212, 175, 55, 0.2); }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="brand-title">✨ متجر أم ليليان</a>
+        <div class="nav-links">
+            <a href="/">المعرض الرئيسي</a>
+            {% if session.get('is_admin') %}
+                <a href="/admin">لوحة التحكم ⚙️</a>
+                <a href="/admin/change-password">تغيير الباسورد 🔑</a>
+                <a href="/logout">خروج 🚪</a>
+            {% else %}
+                <a href="/login">دخول الأدمن 🔒</a>
+            {% endif %}
+        </div>
+    </header>
+
+    __CONTENT_PLACEHOLDER__
+</body>
+</html>"""
+
+@app.route('/')
+def home():
+    items = Item.query.all()
+    content = """
+    <div class="hero-banner">
+        <h1>مرحباً بكم في متجر أم ليليان</h1>
+        <p>أرقى التشكيلات الفاخرة المختارة بعناية لتناسب ذوقك الرفيع</p>
+        <div class="search-box">
+            <input type="text" placeholder="ابحثي عن قطعتك المفضلة...">
+        </div>
+    </div>
+    <div class="container">
+        {% if items %}
+            <div class="grid">
+                {% for item in items %}
+                    <div class="card">
+                        <div>
+                            <div class="card-img-wrapper">
+                                <img src="{{ item.image }}" alt="{{ item.name }}">
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ item.name }}</h3>
+                                <div class="card-price">{{ item.price }} د.أ</div>
+                            </div>
+                        </div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <a href="https://wa.me/962797174200?text=مرحباً، أود الاستفسار وطلب هذه القطعة: {{ item.name }} (السعر: {{ item.price }})" 
+                               target="_blank" class="btn btn-whatsapp">
+                                💬 اطلب عبر الواتساب
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; color: var(--text-muted); margin-top: 2rem;">
+                لا توجد قطع معروضة حالياً، يمكنك إضافتها من لوحة التحكم.
+            </p>
+        {% endif %}
+    </div>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), items=items)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        password = request.form.get('password')
+        admin_pass = AdminSetting.query.filter_by(key='password').first()
+        if admin_pass and password == admin_pass.value:
+            session['is_admin'] = True
+            return redirect(url_for('admin'))
+        else:
+            error = "كلمة المرور غير صحيحة!"
+
+    content = f"""
+    <h2 style="text-align: center; margin-bottom: 25px; font-size: 30px;">دخول لوحة التحكم</h2>
+    <form method="POST">
+        {'<p style="color: red; text-align: center; margin-bottom: 10px;">' + error + '</p>' if error else ''}
+        <div class="field">
+            <label>كلمة المرور</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">تسجيل الدخول</button>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="/forgot-password" style="color: var(--gold-primary); text-decoration: none; font-size: 14px;">نسيت كلمة المرور؟</a>
+        </div>
+    </form>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    msg = None
+    error = None
+    if request.method == 'POST':
+        admin_pass = AdminSetting.query.filter_by(key='password').first()
+        if admin_pass:
+            try:
+                msg_mail = Message('استعادة كلمة مرور لوحة التحكم - متجر أم ليليان',
+                              recipients=[app.config['MAIL_USERNAME']])
+                msg_mail.body = f"مرحباً بك، كلمة المرور الخاصة بلوحة التحكم هي: {admin_pass.value}"
+                mail.send(msg_mail)
+                msg = "تم إرسال كلمة المرور بنجاح إلى بريدك الإلكتروني المعتمد!"
+            except Exception as e:
+                error = "حدث خطأ أثناء إرسال البريد: تأكد من إعدادات البريد الصحيحة."
+
+    content = f"""
+    <h2 style="text-align: center; margin-bottom: 25px; font-size: 30px;">استعادة كلمة المرور</h2>
+    <form method="POST">
+        {'<p style="color: green; text-align: center; margin-bottom: 15px;">' + msg + '</p>' if msg else ''}
+        {'<p style="color: red; text-align: center; margin-bottom: 15px;">' + error + '</p>' if error else ''}
+        <p style="color: var(--text-muted); text-align: center; margin-bottom: 20px; font-size: 14px;">
+            اضغط على الزر أدناه ليتم إرسال كلمة المرور الحالية فوراً إلى بريدك الإلكتروني المسجل.
+        </p>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">إرسال كلمة المرور إلى إيميلي</button>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="/login" style="color: var(--text-light); text-decoration: none; font-size: 14px;">العودة لتسجيل الدخول</a>
+        </div>
+    </form>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
+
+@app.route('/logout')
+def logout():
+    session.pop('is_admin', None)
+    return redirect(url_for('home'))
+
+@app.route('/admin/change-password', methods=['GET', 'POST'])
+def change_password():
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
+    
+    msg = None
+    error = None
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        admin_pass = AdminSetting.query.filter_by(key='password').first()
+        if admin_pass and old_password == admin_pass.value:
+            admin_pass.value = new_password
+            db.session.commit()
+            msg = "تم تغيير كلمة المرور بنجاح!"
+        else:
+            error = "كلمة المرور الحالية غير صحيحة!"
+
+    content = f"""
+    <h2 style="text-align: center; margin-bottom: 25px; font-size: 30px;">تغيير كلمة المرور</h2>
+    <form method="POST">
+        {'<p style="color: green; text-align: center; margin-bottom: 10px;">' + msg + '</p>' if msg else ''}
+        {'<p style="color: red; text-align: center; margin-bottom: 10px;">' + error + '</p>' if error else ''}
+        <div class="field">
+            <label>كلمة المرور الحالية</label>
+            <input type="password" name="old_password" required>
+        </div>
+        <div class="field">
+            <label>كلمة المرور الجديدة</label>
+            <input type="password" name="new_password" required>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">حفظ كلمة المرور الجديدة</button>
+    </form>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content))
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        price = request.form['price']
+        file = request.files.get('image')
+
+        if file:
+            upload_result = cloudinary.uploader.upload(file)
+            image_url = upload_result['secure_url']
+            new_item = Item(name=name, price=price, image=image_url)
+            db.session.add(new_item)
+            db.session.commit()
+            return redirect(url_for('admin'))
+
+    items = Item.query.all()
+    content = """
+    <h2 style="text-align: center; margin-bottom: 20px; font-size: 30px;">لوحة تحكم المشرف</h2>
+    <form method="POST" enctype="multipart/form-data" style="max-width: 500px; margin-bottom: 40px;">
+        <h3 style="margin-bottom: 15px; color: var(--gold-primary);">إضافة قطعة مجوهرات جديدة</h3>
+        <div class="field">
+            <label>اسم القطعة</label>
+            <input type="text" name="name" required>
+        </div>
+        <div class="field">
+            <label>السعر (د.أ)</label>
+            <input type="text" name="price" required>
+        </div>
+        <div class="field">
+            <label>صورة القطعة</label>
+            <input type="file" name="image" required style="padding: 10px;">
+        </div>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 12px;">إضافة القطعة للمعرض</button>
+    </form>
+
+    <h3 style="text-align: center; margin-bottom: 20px; color: var(--gold-primary);">القطع الحالية في المتجر</h3>
+    <div class="container" style="padding: 0;">
+        {% if items %}
+            <div class="grid">
+                {% for item in items %}
+                    <div class="card">
+                        <div>
+                            <div class="card-img-wrapper">
+                                <img src="{{ item.image }}" alt="{{ item.name }}">
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ item.name }}</h3>
+                                <div class="card-price">{{ item.price }} د.أ</div>
+                            </div>
+                        </div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <form action="/admin/delete/{{ item.id }}" method="POST" style="margin: 0; padding: 0; border: none; background: transparent;">
+                                <button type="submit" class="btn btn-danger" style="width: 100%;">حذف القطعة 🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; color: var(--text-muted);">لا توجد قطع مضافة حالياً.</p>
+        {% endif %}
+    </div>
+    """
+    return render_template_string(HTML_LAYOUT.replace("__CONTENT_PLACEHOLDER__", content), items=items)
+
+@app.route('/admin/delete/<int:id>', methods=['POST'])
+def delete_item(id):
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
+    item = Item.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
