@@ -3,4 +3,4 @@ flask-SQLAlchemy
 flask-mail
 cloudinary
 gunicorn
-psycopg2-binary
+psycopg
