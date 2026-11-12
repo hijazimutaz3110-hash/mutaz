@@ -9,13 +9,8 @@ import cloudinary.uploader
 app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this'
 
-# تعديل وتثبيت رابط قاعدة البيانات ليتوافق تماماً مع psycopg و Supabase
-db_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
-if db_url:
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
-    elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+psycopg://"):
-        db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+# تثبيت رابط قاعدة البيانات مباشرة لتجاوز مشكلة قراءة متغيرات البيئة على Render
+db_url = "postgresql+psycopg://postgres:mutazhijzi%40123456@db.llvruluufohgdfltpcgi.supabase.co:5432/postgres"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
