@@ -9,8 +9,8 @@ import cloudinary.uploader
 app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this'
 
-# تثبيت رابط قاعدة البيانات مباشرة لتجاوز مشكلة قراءة متغيرات البيئة على Render
-db_url = "postgresql+psycopg://postgres:mutazhijzi%40123456@db.llvruluufohgdfltpcgi.supabase.co:5432/postgres"
+# رابط قاعدة البيانات النهائي (Transaction Pooler متوافق مع Render و psycopg)
+db_url = "postgresql+psycopg://postgres.llvruluufghdfltpcgi:mutazhijzi%40123456@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
