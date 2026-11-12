@@ -10,8 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this'
 
 # رابط قاعدة البيانات النهائي (Transaction Pooler متوافق مع Render و psycopg)
-db_url = "postgresql+psycopg://postgres.llvruluufghdfltpcgi:mutazhijzi%40123456@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
-
+db_url = "postgresql+psycopg://postgres.llvruluufohgdfltpcgi:mutazhijzi%40123456@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
